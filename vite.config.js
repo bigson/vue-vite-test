@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
+const path               = require('path')
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -17,7 +18,7 @@ all.forEach(function(e, i){
     }
 })
 
-console.log(head, style, import.meta)
+console.log(head, style, import.meta, path.resolve(__dirname, "src/views/abc.head.scss"))
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -27,12 +28,30 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  build: {
+    // lib:{
+    //   head : {
+    //     entry : path.resolve(__dirname, "src/views/abc.head.scss"),
+    //     fileName : 'head_css'
+    //   },
+    //   style : {
+    //     entry: path.resolve(__dirname, "src/views/abc.scss"),
+    //     fileName : 'style_css'
+    //   }
+    // },
+    rollupOptions: {
+      input:{
+        main: path.resolve(__dirname, 'index.html'),
+        head_css: path.resolve(__dirname, "src/views/abc.head.scss"),
+        style_css: path.resolve(__dirname, "src/views/abc.scss"),
+      }
+    }
+  },
   css: {
     preprocessorOptions: {
       scss: {
         additionalData: `
           @import "@/views/_variables.scss";
-          @import "@/views/abc.head.scss";
         `
       }
     }
