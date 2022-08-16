@@ -4,6 +4,7 @@ const path               = require('path')
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import glob from 'glob'
+const fs = require('fs')
 
 var all = glob.sync('./src/**/*.scss'),
     style = [],
@@ -12,23 +13,40 @@ var all = glob.sync('./src/**/*.scss'),
 all.forEach(function(e, i){
     console.log(e)
     if(e.match((/.*\.head\.scss/))){
-        head.push(e)
+        head.push(path.resolve(__dirname, e))
     }else{
-        style.push(e)
+        style.push(path.resolve(__dirname, e))
     }
 })
+
+const htmlPlugin = () => {
+  return {
+    name: 'html-transform',
+    transformIndexHtml: async function(html, context){
+      console.log(html, context, process.argv)
+      // let css = await fs.readFile(path.resolve(__dirname, 'dist/assets/'), 'utf8')
+
+      html = html.replace(
+          /<title>(.*?)<\/title>/,
+          `<title>bigson</title>`)
+
+      return html
+    }
+  }
+}
 
 console.log(head, style, import.meta, path.resolve(__dirname, "src/views/abc.head.scss"))
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), htmlPlugin ()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
   build: {
+    manifest: true,
     // lib:{
     //   head : {
     //     entry : path.resolve(__dirname, "src/views/abc.head.scss"),
@@ -42,8 +60,8 @@ export default defineConfig({
     rollupOptions: {
       input:{
         main: path.resolve(__dirname, 'index.html'),
-        head_css: path.resolve(__dirname, "src/views/abc.head.scss"),
-        style_css: path.resolve(__dirname, "src/views/abc.scss"),
+        head_css: head,
+        style_css: style,
       }
     }
   },
@@ -55,5 +73,5 @@ export default defineConfig({
         `
       }
     }
-  }
+  },
 })
