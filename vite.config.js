@@ -29,6 +29,7 @@ const htmlPlugin = () => {
                         /<title>(.*?)<\/title>/,
                         `<title>bigson</title>`)
 
+            // Nếu mà build thì mới gắn CSS vào file index
             if(process.argv.includes('build')){
                 let bundles = Object.values(bundle),
                 head = bundles.find(x => x.name == 'src/assets/head.scss')
